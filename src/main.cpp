@@ -44,8 +44,8 @@ void setup() {
   pinMode(relaisPin, OUTPUT);
   digitalWrite(relaisPin, HIGH);
 
-  for(byte i = 0; i<4; i++)         //Bei der ersten Benutzung des Tresors wird ein anderer Wert in die
-    EEPROM.write(i, '0');           //EEPROM-Speicherzellen geschrieben. Nur so kann er oeffnen.
+  //for(byte i = 0; i<4; i++)         //Bei der ersten Benutzung des Tresors wird ein anderer Wert in die
+    //EEPROM.write(i, '0');           //EEPROM-Speicherzellen geschrieben. Nur so kann er oeffnen.
                                       //Das Einstellen eines neuen Codes ist erst nach dem Oeffnen moeglich
                                       //Es reicht, die Kommentarzeichen am Zeilenanfang zu entfernen, den
                                       //Sketch hochzuladen und einmal laufen lassen. Anschliessend werden
