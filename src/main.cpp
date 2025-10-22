@@ -35,7 +35,7 @@ Adafruit_SSD1306 display(1); //Die Instanz display erwartet zwingend einen Wert.
 
 
 //Funktionsdeklarationen
-bool code_eingeben();
+void code_eingeben();
 
 void setup() {
   servomotor.attach(servoPin);        //Verbindet unseren servomotor an servoPin (Pin 4). Initialisierung
@@ -44,8 +44,8 @@ void setup() {
   pinMode(relaisPin, OUTPUT);
   digitalWrite(relaisPin, HIGH);
 
-  //for(byte i = 0; i<4; i++)         //Bei der ersten Benutzung des Tresors wird ein anderer Wert in die
-  //  EEPROM.write(i, '0');           //EEPROM-Speicherzellen geschrieben. Nur so kann er oeffnen.
+  for(byte i = 0; i<4; i++)         //Bei der ersten Benutzung des Tresors wird ein anderer Wert in die
+    EEPROM.write(i, '0');           //EEPROM-Speicherzellen geschrieben. Nur so kann er oeffnen.
                                       //Das Einstellen eines neuen Codes ist erst nach dem Oeffnen moeglich
                                       //Es reicht, die Kommentarzeichen am Zeilenanfang zu entfernen, den
                                       //Sketch hochzuladen und einmal laufen lassen. Anschliessend werden
@@ -71,7 +71,7 @@ void loop() {
 }
 
 //Funktionsdefinitionen
-bool code_eingeben() {
+void code_eingeben() {
   char taste = tastatur.getKey();         //Tastenabfrage
   if (taste) {                            //Falls Taste gedrueckt,
     autoAus = millis() + ausschaltzeit;   //dann Ausschaltcountdown zuruecksetzen
@@ -97,8 +97,62 @@ bool code_eingeben() {
       display.display();
     }
 
-    if(cursor == 4) {
-      //......
+    if(cursor == 4) {                 //Fall, wenn alle Ziffern eingegeben wurden:
+      if(codeSetzen) {                //Falls Eingabecode als neuer Schliesscode gespeichert werden soll,
+        EEPROM.write(0, eingabe[0]);  //wird der Code in EEPROM gespeichert
+        EEPROM.write(1, eingabe[1]);
+        EEPROM.write(2, eingabe[2]);
+        EEPROM.write(3, eingabe[3]);
+
+        display.clearDisplay();
+        display.setTextSize(3);
+        display.setCursor(20,8);
+        display.print("Ok!");
+        display.display();
+        delay(2000);
+        digitalWrite(relaisPin, LOW); //Abschalten
+        while(1);
+      }
+
+      if(eingabe[0] == code[0] && eingabe[1] == code[1]       //Falls codeSetzen nicht aktiv, Eingabe gilt
+        && eingabe[2] == code[2] && eingabe[3] == code[3]) {  //als Oeffnungsversuch und wird mit dem gespeicherten
+          display.clearDisplay();                             //Code verglichen
+          display.setTextSize(3);
+          display.setCursor(1,22);
+          display.print("korrekt");
+          display.display();
+
+          servomotor.write(45);                //Servo oeffnet
+        }
+        else {
+          display.clearDisplay();
+          display.setTextSize(3);
+          display.setCursor(1,22);
+          display.print("falsch");
+          display.display();
+          delay(2000);
+          digitalWrite(relaisPin, LOW);      //Abschalten
+          while(1);
+        }
+        if(taste == '*') {                   //druecken von * nach korrekter Eingabe
+          display.clearDisplay();
+          display.setTextSize(3);
+          display.setTextColor(WHITE);
+          display.setCursor(0,7);
+          display.print("Neuer Code?");
+          display.display();
+
+          for(byte i = 0; i<4; i++) {       //eingabe-Array zuruecksetzen ('x' als Platzhalter)
+            eingabe[i] = 'x';
+          }
+          cursor = 0;
+          codeSetzen = 1;
+        }
     }
+  }
+
+  if(millis() > autoAus) {
+    digitalWrite(relaisPin, LOW);
+    while(1);
   }
 }
