@@ -35,7 +35,7 @@ Adafruit_SSD1306 display(1); //Die Instanz display erwartet zwingend einen Wert.
 
 
 //Funktionsdeklarationen
-int myFunction(int, int);
+bool code_eingeben();
 
 void setup() {
   servomotor.attach(servoPin);        //Verbindet unseren servomotor an servoPin (Pin 4). Initialisierung
@@ -67,13 +67,38 @@ void setup() {
 }
 
 void loop() {
-  servomotor.write(90);  //Ueberpruefung fur Bewegung des Motors
-  delay(1000);
-  servomotor.write(180);
-  delay(1000);
+  code_eingeben();
 }
 
-//Fiunktionsdefinitionen
-int myFunction(int x, int y) {
-  return x + y;
+//Funktionsdefinitionen
+bool code_eingeben() {
+  char taste = tastatur.getKey();         //Tastenabfrage
+  if (taste) {                            //Falls Taste gedrueckt,
+    autoAus = millis() + ausschaltzeit;   //dann Ausschaltcountdown zuruecksetzen
+
+    if(taste == '#') {                    //Falls '#' gedrueckt
+      digitalWrite(relaisPin, LOW);       //Abschalten --> Relaiskontakt abfallen lassen
+      while (1);                          //Programm festhalten, bis die Batterie getrennt ist. (Programmende)
+    }
+
+    if(cursor < 4) {                      //Falls Cursor noch nicht an der Endposition
+      if(taste == '*') {                  //Taste '*' loescht das letzte Zeichen...
+        if(cursor) {cursor--;}            //...dazu Rueckschritt des Cursors
+        eingabe[cursor] = '_';
+      }
+      else {                              //Andere Eingaben ausser * und # werden im eingabe-Array gespeichert
+        eingabe[cursor++] = taste;
+      }
+
+      display.clearDisplay();
+      display.setTextSize(3);
+      display.setCursor(15,8);
+      display.print(eingabe);             //aktuelles Eingabearray wird angezeigt
+      display.display();
+    }
+
+    if(cursor == 4) {
+      //......
+    }
+  }
 }
