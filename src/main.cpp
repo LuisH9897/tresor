@@ -118,7 +118,7 @@ void code_eingeben() {
         && eingabe[2] == code[2] && eingabe[3] == code[3]) {  //als Oeffnungsversuch und wird mit dem gespeicherten
           display.clearDisplay();                             //Code verglichen
           display.setTextSize(3);
-          display.setCursor(1,22);
+          display.setCursor(1,8);
           display.print("korrekt");
           display.display();
 
@@ -127,7 +127,7 @@ void code_eingeben() {
         else {
           display.clearDisplay();
           display.setTextSize(3);
-          display.setCursor(1,22);
+          display.setCursor(1,8);
           display.print("falsch");
           display.display();
           delay(2000);
@@ -136,9 +136,9 @@ void code_eingeben() {
         }
         if(taste == '*') {                   //druecken von * nach korrekter Eingabe
           display.clearDisplay();
-          display.setTextSize(3);
+          display.setTextSize(2);
           display.setTextColor(WHITE);
-          display.setCursor(0,7);
+          display.setCursor(0,1);
           display.print("Neuer Code?");
           display.display();
 
